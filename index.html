@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fffaf1" />
+    <title>나의 팀 찾기</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="loading-view" class="screen card centered" aria-live="polite">
+        <div class="loader" aria-hidden="true"></div>
+        <p>설문을 준비하고 있어요.</p>
+      </section>
+
+      <section id="error-view" class="screen card centered hidden" role="alert">
+        <span class="hero-icon" aria-hidden="true">⚠️</span>
+        <h1>설문을 불러오지 못했어요</h1>
+        <p>잠시 후 페이지를 새로고침해 주세요.</p>
+        <button id="retry-button" class="primary-button" type="button">다시 시도</button>
+      </section>
+
+      <section id="intro-view" class="screen card hidden">
+        <div class="animal-row" aria-hidden="true">
+          <span>🐷</span><span>🐶</span><span>🐑</span><span>🐮</span><span>🐴</span>
+        </div>
+        <p class="eyebrow">도 · 개 · 걸 · 윷 · 모</p>
+        <h1 id="survey-title">나의 팀 찾기</h1>
+        <p id="survey-description" class="lead"></p>
+
+        <div class="info-box">
+          <div><strong>25개</strong><span>간단한 문항</span></div>
+          <div><strong>5~7분</strong><span>예상 시간</span></div>
+        </div>
+
+        <label class="name-field" for="participant-name">
+          <span>이름을 입력해주세요</span>
+          <input id="participant-name" type="text" maxlength="20" autocomplete="name" placeholder="이름을 입력해 주세요" />
+          <small id="name-error" class="field-error" aria-live="polite"></small>
+        </label>
+
+        <p class="privacy-note">입력한 정보는 팀 배정과 명단 확인에만 사용됩니다.</p>
+        <button id="start-button" class="primary-button" type="button">설문 시작하기</button>
+      </section>
+
+      <section id="question-view" class="screen hidden">
+        <header class="survey-header">
+          <button id="exit-button" class="text-button" type="button">처음으로</button>
+          <span id="participant-label" class="participant-label"></span>
+        </header>
+
+        <div class="progress-meta">
+          <span id="progress-label">1 / 25</span>
+          <span id="progress-percent">4%</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+
+        <form id="question-form" class="question-card">
+          <fieldset>
+            <legend id="question-text"></legend>
+            <p class="question-help">평소의 나와 가장 가까운 답을 선택해 주세요.</p>
+            <div id="answer-options" class="answer-options"></div>
+          </fieldset>
+        </form>
+
+        <nav class="question-nav" aria-label="설문 이동">
+          <button id="previous-button" class="secondary-button" type="button">이전</button>
+          <button id="next-button" class="primary-button" type="button" disabled>다음</button>
+        </nav>
+        <p class="autosave-note">응답은 이 기기에 자동으로 임시 저장됩니다.</p>
+      </section>
+
+      <section id="review-view" class="screen card hidden">
+        <span class="hero-icon" aria-hidden="true">✅</span>
+        <p class="eyebrow">마지막 확인</p>
+        <h1>모든 문항에 답했어요!</h1>
+        <p class="lead"><strong id="review-name"></strong>님의 응답을 제출할까요?</p>
+        <div class="review-box">
+          <span>응답 문항</span>
+          <strong id="review-count">25 / 25</strong>
+        </div>
+        <button id="submit-button" class="primary-button" type="button">응답 제출하기</button>
+        <button id="back-to-survey-button" class="text-button full-width" type="button">응답 다시 확인하기</button>
+      </section>
+
+      <section id="complete-view" class="screen card centered hidden" aria-live="polite">
+        <div class="celebration" aria-hidden="true">🎉</div>
+        <p class="eyebrow">제출 완료</p>
+        <h1>참여해 주셔서 감사합니다!</h1>
+        <p class="lead">설문이 정상적으로 제출되었습니다.<br />최종 팀은 진행자의 안내를 기다려 주세요.</p>
+        <div class="animal-row small" aria-hidden="true">
+          <span>🐷</span><span>🐶</span><span>🐑</span><span>🐮</span><span>🐴</span>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
