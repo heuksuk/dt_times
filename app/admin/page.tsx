@@ -7,6 +7,7 @@ import { ADMIN_SESSION_COOKIE, isValidAdminSession } from "@/lib/admin-auth";
 import { getAutomaticTargets, getTeamCounts, hasImbalance } from "@/lib/balance";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { TEAM_CODES, type TeamCode } from "@/lib/types";
+import { TEAM_INFO } from "@/lib/team-info";
 
 export const dynamic = "force-dynamic";
 
@@ -18,19 +19,10 @@ const TEAM_LABELS: Record<TeamCode, string> = {
   MO: "모 · 말",
 };
 
-type Participant = {
-  id: string;
-  name: string;
-  current_team: TeamCode;
-  submitted_at: string;
-};
+type Participant = { id: string; name: string; current_team: TeamCode; submitted_at: string; };
 
 function isTeamCode(value: string): value is TeamCode {
   return TEAM_CODES.includes(value as TeamCode);
-}
-
-function formatSubmittedAt(value: string) {
-  return new Intl.DateTimeFormat("ko-KR", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Seoul" }).format(new Date(value));
 }
 
 export default async function AdminPage() {
@@ -60,8 +52,7 @@ export default async function AdminPage() {
   }
 
   const counts = getTeamCounts(participants.map((participant) => participant.current_team));
-  const targets = getAutomaticTargets(counts);
-  const imbalanceExists = hasImbalance(counts, targets);
+  const imbalanceExists = hasImbalance(counts, getAutomaticTargets(counts));
 
   return (
     <main className="admin-shell">
@@ -80,22 +71,14 @@ export default async function AdminPage() {
           <div className="team-grid">
             {TEAM_CODES.map((team) => {
               const members = participants.filter((participant) => participant.current_team === team);
-              const difference = members.length - targets[team];
+              const info = TEAM_INFO[team];
 
               return (
-                <section className="team-card" key={team}>
-                  <div className="team-card-title"><h2>{TEAM_LABELS[team]}</h2><strong>{members.length}명</strong></div>
-                  <p className="team-balance-status">
-                    자동 목표 {targets[team]}명 · {difference > 0 ? `${difference}명 초과` : difference < 0 ? `${Math.abs(difference)}명 부족` : "균형"}
-                  </p>
-                  {members.length === 0 ? (
-                    <p className="empty-team">아직 참여자가 없습니다.</p>
-                  ) : (
-                    <ul className="participant-list">
-                      {members.map((participant) => <li key={participant.id}><span>{participant.name}</span><time>{formatSubmittedAt(participant.submitted_at)}</time></li>)}
-                    </ul>
-                  )}
-                </section>
+                <Link className="team-card" data-team={team} href={`/admin/team/${team}`} key={team}>
+                  <span className="team-card-icon" aria-hidden="true">{info.icon}</span>
+                  <div className="team-card-content"><p>{TEAM_LABELS[team]}</p><h2>{info.summary}</h2><span>팀 소개 보기 →</span></div>
+                  <strong className="team-card-count">{members.length}<small>명</small></strong>
+                </Link>
               );
             })}
           </div>
@@ -104,3 +87,4 @@ export default async function AdminPage() {
     </main>
   );
 }
+import Link from "next/link";
