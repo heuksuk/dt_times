@@ -13,11 +13,11 @@ type TeamInfo = {
 };
 
 const icons: Record<TeamCode, string> = {
-  DO: "/team-icons/pig.webp",
-  GAE: "/team-icons/dog.webp",
-  GEOL: "/team-icons/sheep.webp",
-  YUT: "/team-icons/cow.webp",
-  MO: "/team-icons/horse.webp",
+  DO: "/team-icons/pig.png",
+  GAE: "/team-icons/dog.png",
+  GEOL: "/team-icons/sheep.png",
+  YUT: "/team-icons/cow.png",
+  MO: "/team-icons/horse.png",
 };
 
 const profiles: Record<

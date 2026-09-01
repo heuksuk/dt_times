@@ -67,7 +67,7 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ tea
         <div className="team-hero-icon" aria-hidden="true"><Image alt="" height={150} priority src={info.icon} width={150} /></div>
         <div>
           <p className="team-hero-kicker">우리 팀을 소개합니다</p>
-          <h1 className="team-detail-title"><span className="yut-badge">{info.name}</span><span>{info.animal} 팀</span></h1>
+          <h1 className="team-detail-title"><span className="team-detail-yut">{info.name}</span><span>{info.animal} 팀</span></h1>
           <p className="team-summary">{info.summary}</p>
         </div>
       </section>

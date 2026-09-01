@@ -1,34 +1,37 @@
 "use client";
 
 import { useState } from "react";
+import { MoveArrow } from "../icons";
 import type { TeamCode } from "@/lib/types";
 
 type Move = { participantName: string; fromTeam: TeamCode; toTeam: TeamCode };
 
 const TEAM_LABELS: Record<TeamCode, string> = {
-  DO: "도 · 돼지",
-  GAE: "개 · 강아지",
-  GEOL: "걸 · 양",
-  YUT: "윷 · 소",
-  MO: "모 · 말",
+  DO: "도 (돼지)",
+  GAE: "개 (강아지)",
+  GEOL: "걸 (양)",
+  YUT: "윷 (소)",
+  MO: "모 (말)",
 };
 
 export default function BalanceControl({ submissionsOpen, hasImbalance }: { submissionsOpen: boolean; hasImbalance: boolean }) {
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState("");
   const [activeMove, setActiveMove] = useState<Move | null>(null);
+  const [step, setStep] = useState({ current: 0, total: 0 });
 
   function playMoves(moves: Move[]) {
     let index = 0;
 
     const showNextMove = () => {
       setActiveMove(moves[index]);
+      setStep({ current: index + 1, total: moves.length });
       index += 1;
 
       if (index < moves.length) {
-        window.setTimeout(showNextMove, 1300);
+        window.setTimeout(showNextMove, 1500);
       } else {
-        window.setTimeout(() => window.location.reload(), 1800);
+        window.setTimeout(() => window.location.reload(), 2000);
       }
     };
 
@@ -78,15 +81,31 @@ export default function BalanceControl({ submissionsOpen, hasImbalance }: { subm
       : "현재 모든 팀의 인원이 자동 목표에 맞습니다.";
 
   return (
-    <section className="balance-control">
-      <div><h2>자동 팀 밸런스</h2><p>{description}</p></div>
-      <div className="balance-action">
-        {activeMove && <p className="roulette-result" aria-live="polite">🎯 <strong>{activeMove.participantName}</strong>님: {TEAM_LABELS[activeMove.fromTeam]} → {TEAM_LABELS[activeMove.toTeam]}</p>}
-        {error && <p className="submit-error" role="alert">{error}</p>}
-        <button className="primary-button" disabled={disabled} onClick={balanceTeams} type="button">
-          {isRunning ? "룰렛 실행 중..." : "자동 룰렛 실행"}
-        </button>
-      </div>
-    </section>
+    <>
+      <section className="balance-control">
+        <div><h2>자동 팀 밸런스</h2><p>{description}</p></div>
+        <div className="balance-action">
+          {error && <p className="submit-error" role="alert">{error}</p>}
+          <button className="primary-button" disabled={disabled} onClick={balanceTeams} type="button">
+            {isRunning ? "룰렛 실행 중..." : "자동 룰렛 실행"}
+          </button>
+        </div>
+      </section>
+
+      {activeMove && (
+        <div className="roulette-stage" aria-live="polite" role="status">
+          <div className="roulette-card" key={step.current}>
+            <p className="roulette-kicker">자동 룰렛</p>
+            <strong className="roulette-name">{activeMove.participantName}</strong>
+            <div className="roulette-move">
+              <span className="roulette-team from">{TEAM_LABELS[activeMove.fromTeam]}</span>
+              <MoveArrow />
+              <span className="roulette-team to">{TEAM_LABELS[activeMove.toTeam]}</span>
+            </div>
+            <p className="roulette-progress">{step.current} / {step.total}</p>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

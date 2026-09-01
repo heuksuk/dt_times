@@ -38,16 +38,13 @@ h1, h2, .festival-type { color: var(--festival-ink); font-family: var(--font-fes
 h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter-spacing: -0.045em; }
 .lead { margin: 15px 0 0; color: var(--muted); font-size: 1.04rem; line-height: 1.7; }
 
-.animal-row { display: flex; justify-content: center; gap: 7px; margin: 0 0 27px; }
-.animal-token { position: relative; display: grid; width: 58px; height: 64px; flex: 0 1 58px; place-items: center; border: 1px solid rgba(182, 74, 61, 0.13); border-radius: 24px 24px 20px 20px; background: rgba(255, 248, 230, 0.88); }
-.animal-token img { width: 56px; height: 56px; object-fit: contain; }
-.yut-badge { display: inline-grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border: 2px solid var(--seal); border-radius: 48% 52% 47% 53%; color: var(--seal); background: #fffaf0; box-shadow: inset 0 0 0 2px rgba(182, 74, 61, 0.09); font-family: var(--font-festival), "Nanum Myeongjo", serif; font-size: 1rem; font-weight: 700; line-height: 1; transform: rotate(-2deg); }
-.animal-token .yut-badge { position: absolute; right: -2px; bottom: -8px; width: 25px; height: 25px; font-size: 0.75rem; }
+.animal-row { display: flex; justify-content: center; gap: 7px; margin: 0 0 22px; }
+.animal-token { display: grid; width: 58px; height: 58px; flex: 0 1 58px; place-items: center; }
+.animal-token img { width: 54px; height: 54px; object-fit: contain; }
 .animal-row.small { margin: 28px 0 6px; gap: 5px; }
-.animal-row.small .animal-token { width: 45px; height: 48px; flex-basis: 45px; border-radius: 18px; }
-.animal-row.small img { width: 43px; height: 43px; }
-.animal-row.small .yut-badge { right: -1px; bottom: -6px; width: 20px; height: 20px; border-width: 1.5px; font-size: 0.62rem; }
-.info-box { display: grid; grid-template-columns: 1fr 1fr; margin: 28px 0; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #fffcf8; }
+.animal-row.small .animal-token { width: 45px; height: 45px; flex-basis: 45px; }
+.animal-row.small img { width: 42px; height: 42px; }
+.info-box { display: grid; grid-template-columns: 1fr 1fr; margin: 24px 0; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #fffcf8; }
 .info-box div { display: flex; flex-direction: column; gap: 4px; padding: 16px 10px; text-align: center; }
 .info-box div + div { border-left: 1px solid var(--line); }
 .info-box strong { font-size: 1.15rem; }
@@ -58,10 +55,8 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .name-field input { width: 100%; height: 54px; padding: 0 16px; border: 1.5px solid var(--line); border-radius: 14px; color: var(--text); background: #fff; outline: none; }
 .name-field input:focus { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(35, 95, 164, 0.13); }
 .field-error { display: block; min-height: 20px; padding-top: 5px; color: #b72f2f; }
-.privacy-note { color: var(--muted); font-size: 0.78rem; line-height: 1.5; text-align: center; }
-.survey-notice { margin: 14px 0; padding: 14px 15px; border: 1px solid #f1d89b; border-radius: 14px; color: #704f16; background: #fff8df; }
-.survey-notice strong { display: block; margin-bottom: 5px; font-size: 0.88rem; }
-.survey-notice p { margin: 0; font-size: 0.82rem; line-height: 1.55; word-break: keep-all; }
+.intro-notes { margin: 20px 0 0; padding-left: 16px; color: var(--muted); font-size: 0.8rem; line-height: 1.6; }
+.intro-notes li + li { margin-top: 4px; }
 
 .primary-button, .secondary-button { min-height: 54px; border: 0; border-radius: 15px; padding: 0 20px; font-weight: 800; cursor: pointer; }
 .primary-button { width: 100%; color: #fff; background: var(--primary); box-shadow: 0 9px 20px rgba(239, 111, 77, 0.24); }
@@ -84,7 +79,8 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .answer-label[data-selected="true"] { border-color: var(--primary); background: var(--primary-soft); }
 .answer-label input { width: 20px; height: 20px; margin: 0; accent-color: var(--primary); }
 .question-nav { display: grid; grid-template-columns: minmax(100px, 0.65fr) 1.35fr; gap: 10px; }
-.hero-icon, .celebration { display: block; margin-bottom: 16px; font-size: 3.5rem; }
+.hero-icon, .celebration { display: block; margin-bottom: 16px; line-height: 0; }
+.hero-icon svg, .celebration svg { width: 64px; height: 64px; }
 .review-box { display: flex; align-items: center; justify-content: space-between; margin: 28px 0 20px; padding: 17px 18px; border-radius: 15px; background: var(--primary-soft); }
 .review-box span { color: var(--muted); }
 .submit-error { margin: 0 0 12px; color: #b72f2f; font-size: 0.9rem; line-height: 1.5; text-align: center; }
@@ -114,7 +110,16 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .balance-control h2, .target-form-card h2 { margin: 0; font-size: 1.1rem; }
 .balance-control p { margin: 8px 0 0; color: var(--muted); font-size: 0.88rem; }
 .balance-action { min-width: min(100%, 220px); }
-.roulette-result { margin: 0 0 10px !important; padding: 11px; border-radius: 12px; color: #793b26 !important; background: #ffe7d8; font-size: 0.85rem !important; text-align: center; animation: roulette-pop 420ms ease-out; }
+.roulette-stage { position: fixed; z-index: 80; inset: 0; display: grid; padding: 24px; place-items: center; background: rgba(43, 31, 20, 0.62); backdrop-filter: blur(3px); animation: stage-fade 220ms ease-out; }
+.roulette-card { width: min(100%, 520px); padding: 40px 32px; border-radius: 32px; background: var(--surface); box-shadow: 0 30px 70px rgba(30, 20, 10, 0.34); text-align: center; animation: roulette-pop 420ms ease-out; }
+.roulette-kicker { margin: 0 0 14px; color: var(--primary-dark); font-size: 0.76rem; font-weight: 850; letter-spacing: 0.14em; }
+.roulette-name { display: block; margin-bottom: 24px; color: var(--festival-ink); font-family: var(--font-festival), "Nanum Myeongjo", serif; font-size: clamp(1.9rem, 6vw, 2.7rem); line-height: 1.2; letter-spacing: -0.035em; }
+.roulette-move { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.roulette-move svg { flex: 0 0 auto; }
+.roulette-team { padding: 11px 16px; border-radius: 15px; font-size: clamp(0.88rem, 3vw, 1.05rem); font-weight: 800; white-space: nowrap; }
+.roulette-team.from { color: var(--muted); background: #f2ece3; }
+.roulette-team.to { color: #fff; background: var(--primary); box-shadow: 0 9px 20px rgba(239, 111, 77, 0.28); }
+.roulette-progress { margin: 26px 0 0; color: var(--muted); font-size: 0.82rem; font-weight: 750; }
 .move-history { margin-bottom: 18px; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); }
 .move-history-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; border-bottom: 1px solid var(--line); }
 .move-history-header .eyebrow { margin-bottom: 5px; font-size: 0.72rem; }
@@ -134,6 +139,13 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
   from { opacity: 0; transform: scale(0.85) rotate(-2deg); }
   to { opacity: 1; transform: scale(1) rotate(0); }
 }
+@keyframes stage-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .roulette-stage, .roulette-card { animation: none; }
+}
 .team-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .team-card { position: relative; display: flex; min-height: 170px; align-items: flex-start; gap: 16px; overflow: hidden; padding: 22px; border: 1px solid var(--line); border-radius: 24px; color: var(--text); background: var(--surface); box-shadow: 0 8px 20px rgba(89, 61, 34, 0.06); text-decoration: none; transition: transform 180ms ease, box-shadow 180ms ease; }
 .team-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
@@ -144,9 +156,8 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .team-card[data-team="YUT"] { --team-accent: #557da6; --team-soft: #e8f1fb; }
 .team-card[data-team="MO"] { --team-accent: #875f9e; --team-soft: #f3eafa; }
 .team-card-visual { position: relative; z-index: 1; width: 78px; flex: 0 0 78px; }
-.team-card-icon { display: grid; width: 76px; height: 82px; place-items: center; overflow: hidden; border-radius: 25px; background: linear-gradient(155deg, #fffaf0, var(--team-soft)); }
-.team-card-icon img { width: 74px; height: 74px; object-fit: contain; }
-.team-card-visual .yut-badge { position: absolute; right: -5px; bottom: -9px; }
+.team-card-icon { display: grid; width: 78px; height: 78px; place-items: center; overflow: hidden; border-radius: 26px; background: linear-gradient(155deg, #fffaf0, var(--team-soft)); }
+.team-card-icon img { width: 58px; height: 58px; object-fit: contain; }
 .team-card-content { position: relative; z-index: 1; min-width: 0; padding-right: 22px; }
 .team-card-content p { margin: 1px 0 7px; color: var(--team-accent); font-family: var(--font-festival), "Nanum Myeongjo", serif; font-size: 0.95rem; font-weight: 700; }
 .team-card-content h2 { display: -webkit-box; margin: 0; overflow: hidden; font-size: 1rem; font-weight: 750; line-height: 1.5; letter-spacing: -0.025em; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
@@ -164,11 +175,11 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .team-detail-shell[data-team="YUT"] { --detail-accent: #4d7195; --detail-soft: #e8f1fb; }
 .team-detail-shell[data-team="MO"] { --detail-accent: #79538e; --detail-soft: #f3eafa; }
 .team-hero-icon { display: grid; width: 150px; height: 150px; place-items: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.8); border-radius: 44px; background: rgba(255,250,240,0.76); box-shadow: 0 12px 26px rgba(89, 61, 34, 0.1); }
-.team-hero-icon img { width: 144px; height: 144px; object-fit: contain; }
+.team-hero-icon img { width: 112px; height: 112px; object-fit: contain; }
 .team-hero-kicker, .section-kicker { margin: 0 0 7px; color: var(--detail-accent); font-size: 0.78rem; font-weight: 850; letter-spacing: 0.08em; }
 .team-hero h1 { font-size: clamp(2rem, 7vw, 3.25rem); }
 .team-detail-title { display: flex; align-items: center; gap: 12px; }
-.team-detail-title .yut-badge { width: 46px; height: 46px; border-width: 3px; font-size: 1.35rem; }
+.team-detail-yut { display: inline-grid; width: 56px; height: 56px; flex: 0 0 auto; place-items: center; border: 2.5px solid var(--detail-accent); border-radius: 14px; color: var(--detail-accent); background: rgba(255, 255, 255, 0.72); font-family: var(--font-festival), "Nanum Myeongjo", serif; font-size: 1.7rem; line-height: 1; }
 .team-summary { max-width: 460px; margin: 13px 0 0; color: var(--muted); line-height: 1.7; }
 .strength-card, .member-card { margin-top: 18px; padding: 27px; border: 1px solid var(--line); border-radius: 24px; background: rgba(255,255,255,0.92); box-shadow: 0 8px 20px rgba(89, 61, 34, 0.05); }
 .strength-card { display: flex; flex-direction: column; }
@@ -199,8 +210,8 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
   .app-shell { padding-inline: 12px; }
   .card { padding: 29px 20px; border-radius: 23px; }
   .animal-row { gap: 3px; }
-  .animal-token { width: 51px; height: 57px; flex-basis: 51px; }
-  .animal-token img { width: 50px; height: 50px; }
+  .animal-token { width: 51px; height: 51px; flex-basis: 51px; }
+  .animal-token img { width: 48px; height: 48px; }
   .question-card { min-height: 380px; padding: 25px 19px; }
   .admin-shell { padding-inline: 12px; }
   .admin-login-card { padding: 26px 20px; }
@@ -211,6 +222,9 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
   .submission-control .primary-button, .submission-control .danger-button { width: 100%; }
   .balance-control { align-items: stretch; flex-direction: column; gap: 14px; }
   .balance-action { min-width: 0; }
+  .roulette-card { padding: 30px 20px; border-radius: 26px; }
+  .roulette-move { gap: 9px; }
+  .roulette-move svg { width: 30px; }
   .move-history-list li { grid-template-columns: 1fr auto; gap: 6px 12px; padding: 15px 16px; }
   .move-history-list span { grid-column: 1 / -1; grid-row: 2; }
   .move-history-list time { grid-column: 2; grid-row: 1; }
@@ -218,8 +232,9 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
   .team-card { min-height: 150px; }
   .team-detail-shell { padding-inline: 12px; }
   .team-hero { grid-template-columns: 1fr; padding: 26px 22px; }
+  .team-detail-yut { width: 44px; height: 44px; border-width: 2px; border-radius: 11px; font-size: 1.35rem; }
   .team-hero-icon { width: 110px; height: 110px; border-radius: 32px; }
-  .team-hero-icon img { width: 106px; height: 106px; }
+  .team-hero-icon img { width: 82px; height: 82px; }
   .strength-card, .member-card { padding: 22px 18px; }
   .member-list li { grid-template-columns: 30px 1fr; }
   .member-list time { grid-column: 2; }

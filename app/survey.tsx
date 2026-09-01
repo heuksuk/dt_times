@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import surveyConfig from "@/survey-config.json";
+import { CheckSeal, YutCelebration } from "./icons";
 
 type Stage = "intro" | "questions" | "review" | "complete";
 
@@ -25,11 +26,11 @@ const config = surveyConfig as SurveyConfig;
 const CLIENT_TOKEN_KEY = "animal-team-client-token-v1";
 const COMPLETE_KEY = "animal-team-survey-complete-v1";
 const ANIMAL_ICONS = [
-  { label: "도", animal: "돼지", src: "/team-icons/pig.webp" },
-  { label: "개", animal: "강아지", src: "/team-icons/dog.webp" },
-  { label: "걸", animal: "양", src: "/team-icons/sheep.webp" },
-  { label: "윷", animal: "소", src: "/team-icons/cow.webp" },
-  { label: "모", animal: "말", src: "/team-icons/horse.webp" },
+  { label: "도", animal: "돼지", src: "/team-icons/pig.png" },
+  { label: "개", animal: "강아지", src: "/team-icons/dog.png" },
+  { label: "걸", animal: "양", src: "/team-icons/sheep.png" },
+  { label: "윷", animal: "소", src: "/team-icons/cow.png" },
+  { label: "모", animal: "말", src: "/team-icons/horse.png" },
 ];
 
 function AnimalRow({ small = false }: { small?: boolean }) {
@@ -38,7 +39,6 @@ function AnimalRow({ small = false }: { small?: boolean }) {
       {ANIMAL_ICONS.map((icon) => (
         <span className="animal-token" key={icon.label}>
           <Image alt="" height={small ? 44 : 64} src={icon.src} width={small ? 44 : 64} />
-          <b className="yut-badge">{icon.label}</b>
         </span>
       ))}
     </div>
@@ -149,7 +149,7 @@ export default function Survey({ submissionsOpen }: { submissionsOpen: boolean }
     return (
       <main className="app-shell">
         <section className="card centered" aria-live="polite">
-          <div className="celebration" aria-hidden="true">🎉</div>
+          <div className="celebration" aria-hidden="true"><YutCelebration /></div>
           <p className="eyebrow">제출 완료</p>
           <h1>참여해 주셔서 감사합니다</h1>
           <p className="lead">설문이 정상적으로 제출되었습니다.<br />최종 팀은 진행자의 안내를 기다려 주세요.</p>
@@ -163,7 +163,7 @@ export default function Survey({ submissionsOpen }: { submissionsOpen: boolean }
     return (
       <main className="app-shell">
         <section className="card">
-          <span className="hero-icon" aria-hidden="true">✅</span>
+          <span className="hero-icon" aria-hidden="true"><CheckSeal /></span>
           <p className="eyebrow">마지막 확인</p>
           <h1>모든 문항에 답했어요!</h1>
           <p className="lead"><strong>{name}</strong>님의 응답을 제출할까요?</p>
@@ -247,13 +247,13 @@ export default function Survey({ submissionsOpen }: { submissionsOpen: boolean }
           />
           <small className="field-error" role="alert">{nameError}</small>
         </label>
-        <p className="privacy-note">입력한 정보는 팀 배정과 명단 확인에만 사용됩니다.</p>
-        <div className="survey-notice" role="note">
-          <strong>참여 전 꼭 확인해 주세요</strong>
-          <p>설문은 한 기기에서 한 번만 제출할 수 있습니다. 진행 중에는 새로고침하거나 창을 닫지 말아 주세요.</p>
-        </div>
         {!submissionsOpen && <p className="closed-notice" role="status">현재 설문 접수가 마감되었습니다.</p>}
         <button className="primary-button" disabled={!submissionsOpen} type="button" onClick={startSurvey}>설문 시작하기</button>
+        <ul className="intro-notes">
+          <li>설문은 한 기기에서 한 번만 제출할 수 있습니다.</li>
+          <li>진행 중에는 새로고침하거나 창을 닫지 말아 주세요.</li>
+          <li>입력한 정보는 팀 배정과 명단 확인에만 사용됩니다.</li>
+        </ul>
       </section>
     </main>
   );

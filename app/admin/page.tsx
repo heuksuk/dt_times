@@ -15,11 +15,11 @@ import { TEAM_INFO } from "@/lib/team-info";
 export const dynamic = "force-dynamic";
 
 const TEAM_LABELS: Record<TeamCode, string> = {
-  DO: "도 · 돼지",
-  GAE: "개 · 강아지",
-  GEOL: "걸 · 양",
-  YUT: "윷 · 소",
-  MO: "모 · 말",
+  DO: "도 (돼지)",
+  GAE: "개 (강아지)",
+  GEOL: "걸 (양)",
+  YUT: "윷 (소)",
+  MO: "모 (말)",
 };
 
 type Participant = { id: string; name: string; current_team: TeamCode; submitted_at: string; };
@@ -89,7 +89,7 @@ export default async function AdminPage() {
   return (
     <main className="admin-shell">
       <header className="admin-header">
-        <div><p className="eyebrow">관리자</p><h1>행사 현황</h1></div>
+        <div><p className="eyebrow">관리자</p><h1>설문 현황</h1></div>
         <div className="admin-header-actions">
           <RefreshControl checkedAt={checkedAt} />
           <LogoutButton />
@@ -131,7 +131,6 @@ export default async function AdminPage() {
                 <Link className="team-card" data-team={team} href={`/admin/team/${team}`} key={team}>
                   <div className="team-card-visual" aria-hidden="true">
                     <span className="team-card-icon"><Image alt="" height={76} src={info.icon} width={76} /></span>
-                    <span className="yut-badge">{info.name}</span>
                   </div>
                   <div className="team-card-content"><p>{info.animal} 팀</p><h2>{info.summary}</h2><span>팀 소개 보기 →</span></div>
                   <strong className="team-card-count">{members.length}<small>명</small></strong>

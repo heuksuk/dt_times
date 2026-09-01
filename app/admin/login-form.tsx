@@ -37,7 +37,7 @@ export default function AdminLoginForm() {
     <main className="admin-shell">
       <section className="admin-login-card">
         <p className="eyebrow">관리자 전용</p>
-        <h1>행사 현황</h1>
+        <h1>설문 현황</h1>
         <p className="lead">관리자 비밀번호를 입력해 주세요.</p>
         <form className="admin-login-form" onSubmit={submit}>
           <label htmlFor="admin-password">비밀번호</label>
