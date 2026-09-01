@@ -1,0 +1,8 @@
+project_id = "animal-team-event"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
