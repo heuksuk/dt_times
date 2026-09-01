@@ -20,7 +20,13 @@ function isTeamCode(value: string): value is TeamCode {
 }
 
 function formatSubmittedAt(value: string) {
-  return new Intl.DateTimeFormat("ko-KR", { month: "short", day: "numeric", timeStyle: "short", timeZone: "Asia/Seoul" }).format(new Date(value));
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(value));
 }
 
 export default async function TeamDetailPage({ params }: { params: Promise<{ team: string }> }) {
