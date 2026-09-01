@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MoveArrow } from "../icons";
 import type { TeamCode } from "@/lib/types";
 
@@ -14,29 +14,35 @@ const TEAM_LABELS: Record<TeamCode, string> = {
   MO: "모 (말)",
 };
 
+const NEXT_KEYS = ["Enter", " ", "ArrowRight", "PageDown"];
+const PREV_KEYS = ["ArrowLeft", "PageUp"];
+
 export default function BalanceControl({ submissionsOpen, hasImbalance }: { submissionsOpen: boolean; hasImbalance: boolean }) {
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState("");
-  const [activeMove, setActiveMove] = useState<Move | null>(null);
-  const [step, setStep] = useState({ current: 0, total: 0 });
+  const [moves, setMoves] = useState<Move[]>([]);
+  const [index, setIndex] = useState(0);
 
-  function playMoves(moves: Move[]) {
-    let index = 0;
+  const activeMove = moves[index];
+  const isLastMove = index === moves.length - 1;
 
-    const showNextMove = () => {
-      setActiveMove(moves[index]);
-      setStep({ current: index + 1, total: moves.length });
-      index += 1;
+  useEffect(() => {
+    if (!moves.length) return;
 
-      if (index < moves.length) {
-        window.setTimeout(showNextMove, 1500);
-      } else {
-        window.setTimeout(() => window.location.reload(), 2000);
+    function handleKeyDown(event: KeyboardEvent) {
+      if (NEXT_KEYS.includes(event.key)) {
+        event.preventDefault();
+        if (isLastMove) window.location.reload();
+        else setIndex((current) => current + 1);
+      } else if (PREV_KEYS.includes(event.key)) {
+        event.preventDefault();
+        setIndex((current) => Math.max(0, current - 1));
       }
-    };
+    }
 
-    showNextMove();
-  }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [moves.length, isLastMove]);
 
   async function balanceTeams() {
     const confirmed = window.confirm(
@@ -47,7 +53,8 @@ export default function BalanceControl({ submissionsOpen, hasImbalance }: { subm
 
     let isPlaying = false;
     setError("");
-    setActiveMove(null);
+    setMoves([]);
+    setIndex(0);
     setIsRunning(true);
 
     try {
@@ -65,7 +72,7 @@ export default function BalanceControl({ submissionsOpen, hasImbalance }: { subm
       }
 
       isPlaying = true;
-      playMoves(result.moves);
+      setMoves(result.moves);
     } catch {
       setError("네트워크 연결을 확인한 뒤 다시 시도해 주세요.");
     } finally {
@@ -94,7 +101,7 @@ export default function BalanceControl({ submissionsOpen, hasImbalance }: { subm
 
       {activeMove && (
         <div className="roulette-stage" aria-live="polite" role="status">
-          <div className="roulette-card" key={step.current}>
+          <div className="roulette-card" key={index}>
             <p className="roulette-kicker">자동 룰렛</p>
             <strong className="roulette-name">{activeMove.participantName}</strong>
             <div className="roulette-move">
@@ -102,7 +109,26 @@ export default function BalanceControl({ submissionsOpen, hasImbalance }: { subm
               <MoveArrow />
               <span className="roulette-team to">{TEAM_LABELS[activeMove.toTeam]}</span>
             </div>
-            <p className="roulette-progress">{step.current} / {step.total}</p>
+            <p className="roulette-progress">{index + 1} / {moves.length}</p>
+            <div className="roulette-actions">
+              <button
+                className="secondary-button"
+                disabled={index === 0}
+                onClick={() => setIndex((current) => Math.max(0, current - 1))}
+                type="button"
+              >
+                이전
+              </button>
+              <button
+                autoFocus
+                className="primary-button"
+                onClick={() => (isLastMove ? window.location.reload() : setIndex((current) => current + 1))}
+                type="button"
+              >
+                {isLastMove ? "결과 확인하기" : "다음"}
+              </button>
+            </div>
+            <p className="roulette-hint">Enter · Space · → 키로도 넘길 수 있습니다</p>
           </div>
         </div>
       )}
