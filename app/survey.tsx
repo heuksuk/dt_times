@@ -227,6 +227,10 @@ export default function Survey({ submissionsOpen }: { submissionsOpen: boolean }
           <small className="field-error" role="alert">{nameError}</small>
         </label>
         <p className="privacy-note">입력한 정보는 팀 배정과 명단 확인에만 사용됩니다.</p>
+        <div className="survey-notice" role="note">
+          <strong>참여 전 꼭 확인해 주세요</strong>
+          <p>설문은 한 기기에서 한 번만 제출할 수 있습니다. 진행 중에는 새로고침하거나 창을 닫지 말아 주세요.</p>
+        </div>
         {!submissionsOpen && <p className="closed-notice" role="status">현재 설문 접수가 마감되었습니다.</p>}
         <button className="primary-button" disabled={!submissionsOpen} type="button" onClick={startSurvey}>설문 시작하기</button>
       </section>

@@ -36,6 +36,12 @@ export default function BalanceControl({ submissionsOpen, hasImbalance }: { subm
   }
 
   async function balanceTeams() {
+    const confirmed = window.confirm(
+      "초과 팀의 참여자를 무작위로 이동합니다. 실행 후 자동으로 되돌릴 수 없습니다. 계속할까요?",
+    );
+
+    if (!confirmed) return;
+
     let isPlaying = false;
     setError("");
     setActiveMove(null);

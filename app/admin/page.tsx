@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { cookies } from "next/headers";
 import AdminLoginForm from "./login-form";
 import LogoutButton from "./logout-button";
+import RefreshControl from "./refresh-control";
 import SubmissionControl from "./submission-control";
 import BalanceControl from "./balance-control";
 import { ADMIN_SESSION_COOKIE, isValidAdminSession } from "@/lib/admin-auth";
@@ -20,9 +22,29 @@ const TEAM_LABELS: Record<TeamCode, string> = {
 };
 
 type Participant = { id: string; name: string; current_team: TeamCode; submitted_at: string; };
+type TeamMove = { id: string; participant_id: string; from_team: TeamCode; to_team: TeamCode; moved_at: string; };
 
 function isTeamCode(value: string): value is TeamCode {
   return TEAM_CODES.includes(value as TeamCode);
+}
+
+function formatMovedAt(value: string) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(value));
+}
+
+function formatCheckedAt(value: Date) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(value);
 }
 
 export default async function AdminPage() {
@@ -33,18 +55,25 @@ export default async function AdminPage() {
   }
 
   let participants: Participant[] = [];
+  let teamMoves: TeamMove[] = [];
   let submissionsOpen = false;
   let loadError = "";
 
   try {
     const supabase = createSupabaseAdminClient();
-    const [participantsResult, settingsResult] = await Promise.all([
+    const [participantsResult, settingsResult, movesResult] = await Promise.all([
       supabase.from("participants").select("id, name, current_team, submitted_at").order("submitted_at", { ascending: true }),
       supabase.from("event_settings").select("submissions_open").eq("id", true).single(),
+      supabase.from("team_moves").select("id, participant_id, from_team, to_team, moved_at").order("moved_at", { ascending: false }).limit(50),
     ]);
 
-    if (participantsResult.error || settingsResult.error) throw participantsResult.error ?? settingsResult.error;
+    if (participantsResult.error || settingsResult.error || movesResult.error) {
+      throw participantsResult.error ?? settingsResult.error ?? movesResult.error;
+    }
     participants = (participantsResult.data ?? []).filter((participant): participant is Participant => isTeamCode(participant.current_team));
+    teamMoves = (movesResult.data ?? []).filter(
+      (move): move is TeamMove => isTeamCode(move.from_team) && isTeamCode(move.to_team),
+    );
     submissionsOpen = settingsResult.data.submissions_open;
   } catch (error) {
     console.error("Failed to load admin dashboard", error);
@@ -53,12 +82,17 @@ export default async function AdminPage() {
 
   const counts = getTeamCounts(participants.map((participant) => participant.current_team));
   const imbalanceExists = hasImbalance(counts, getAutomaticTargets(counts));
+  const participantNames = new Map(participants.map((participant) => [participant.id, participant.name]));
+  const checkedAt = formatCheckedAt(new Date());
 
   return (
     <main className="admin-shell">
       <header className="admin-header">
         <div><p className="eyebrow">관리자</p><h1>행사 현황</h1></div>
-        <LogoutButton />
+        <div className="admin-header-actions">
+          <RefreshControl checkedAt={checkedAt} />
+          <LogoutButton />
+        </div>
       </header>
 
       {loadError ? (
@@ -68,6 +102,25 @@ export default async function AdminPage() {
           <section className="admin-total"><span>전체 참여 인원</span><strong>{participants.length}명</strong></section>
           <SubmissionControl submissionsOpen={submissionsOpen} />
           <BalanceControl hasImbalance={imbalanceExists} submissionsOpen={submissionsOpen} />
+          <section className="move-history">
+            <div className="move-history-header">
+              <div><p className="eyebrow">룰렛 결과</p><h2>최근 팀 이동 기록</h2></div>
+              <strong>{teamMoves.length}건</strong>
+            </div>
+            {teamMoves.length === 0 ? (
+              <p className="move-history-empty">아직 룰렛으로 이동한 참여자가 없습니다.</p>
+            ) : (
+              <ul className="move-history-list">
+                {teamMoves.map((move) => (
+                  <li key={move.id}>
+                    <strong>{participantNames.get(move.participant_id) ?? "알 수 없는 참여자"}</strong>
+                    <span>{TEAM_LABELS[move.from_team]} <b aria-hidden="true">→</b> {TEAM_LABELS[move.to_team]}</span>
+                    <time>{formatMovedAt(move.moved_at)}</time>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
           <div className="team-grid">
             {TEAM_CODES.map((team) => {
               const members = participants.filter((participant) => participant.current_team === team);
@@ -87,4 +140,3 @@ export default async function AdminPage() {
     </main>
   );
 }
-import Link from "next/link";
