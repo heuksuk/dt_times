@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import surveyConfig from "@/survey-config.json";
 
 type Stage = "intro" | "questions" | "review" | "complete";
@@ -23,6 +24,26 @@ type SurveyConfig = {
 const config = surveyConfig as SurveyConfig;
 const CLIENT_TOKEN_KEY = "animal-team-client-token-v1";
 const COMPLETE_KEY = "animal-team-survey-complete-v1";
+const ANIMAL_ICONS = [
+  { label: "도", animal: "돼지", src: "/team-icons/pig.webp" },
+  { label: "개", animal: "강아지", src: "/team-icons/dog.webp" },
+  { label: "걸", animal: "양", src: "/team-icons/sheep.webp" },
+  { label: "윷", animal: "소", src: "/team-icons/cow.webp" },
+  { label: "모", animal: "말", src: "/team-icons/horse.webp" },
+];
+
+function AnimalRow({ small = false }: { small?: boolean }) {
+  return (
+    <div className={`animal-row${small ? " small" : ""}`} aria-hidden="true">
+      {ANIMAL_ICONS.map((icon) => (
+        <span className="animal-token" key={icon.label}>
+          <Image alt="" height={small ? 44 : 64} src={icon.src} width={small ? 44 : 64} />
+          <b className="yut-badge">{icon.label}</b>
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function shuffled<T>(items: T[]) {
   const result = [...items];
@@ -132,7 +153,7 @@ export default function Survey({ submissionsOpen }: { submissionsOpen: boolean }
           <p className="eyebrow">제출 완료</p>
           <h1>참여해 주셔서 감사합니다</h1>
           <p className="lead">설문이 정상적으로 제출되었습니다.<br />최종 팀은 진행자의 안내를 기다려 주세요.</p>
-          <div className="animal-row small" aria-hidden="true"><span>🐷</span><span>🐶</span><span>🐑</span><span>🐮</span><span>🐴</span></div>
+          <AnimalRow small />
         </section>
       </main>
     );
@@ -204,7 +225,7 @@ export default function Survey({ submissionsOpen }: { submissionsOpen: boolean }
   return (
     <main className="app-shell">
       <section className="card">
-        <div className="animal-row" aria-hidden="true"><span>🐷</span><span>🐶</span><span>🐑</span><span>🐮</span><span>🐴</span></div>
+        <AnimalRow />
         <p className="eyebrow">도 · 개 · 걸 · 윷 · 모</p>
         <h1>{config.title}</h1>
         <p className="lead">{config.description}</p>

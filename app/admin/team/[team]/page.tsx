@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import AdminLoginForm from "../../login-form";
@@ -63,10 +64,10 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ tea
     <main className="team-detail-shell" data-team={team}>
       <Link className="back-link" href="/admin">← 전체 팀 현황</Link>
       <section className="team-hero">
-        <div className="team-hero-icon" aria-hidden="true">{info.icon}</div>
+        <div className="team-hero-icon" aria-hidden="true"><Image alt="" height={150} priority src={info.icon} width={150} /></div>
         <div>
-          <p className="team-hero-kicker">{info.animal} 팀</p>
-          <h1>{info.name} · {info.animal}</h1>
+          <p className="team-hero-kicker">우리 팀을 소개합니다</p>
+          <h1 className="team-detail-title"><span className="yut-badge">{info.name}</span><span>{info.animal} 팀</span></h1>
           <p className="team-summary">{info.summary}</p>
         </div>
       </section>

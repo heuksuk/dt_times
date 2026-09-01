@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cookies } from "next/headers";
 import AdminLoginForm from "./login-form";
 import LogoutButton from "./logout-button";
@@ -15,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 const TEAM_LABELS: Record<TeamCode, string> = {
   DO: "도 · 돼지",
-  GAE: "개 · 개",
+  GAE: "개 · 강아지",
   GEOL: "걸 · 양",
   YUT: "윷 · 소",
   MO: "모 · 말",
@@ -128,8 +129,11 @@ export default async function AdminPage() {
 
               return (
                 <Link className="team-card" data-team={team} href={`/admin/team/${team}`} key={team}>
-                  <span className="team-card-icon" aria-hidden="true">{info.icon}</span>
-                  <div className="team-card-content"><p>{TEAM_LABELS[team]}</p><h2>{info.summary}</h2><span>팀 소개 보기 →</span></div>
+                  <div className="team-card-visual" aria-hidden="true">
+                    <span className="team-card-icon"><Image alt="" height={76} src={info.icon} width={76} /></span>
+                    <span className="yut-badge">{info.name}</span>
+                  </div>
+                  <div className="team-card-content"><p>{info.animal} 팀</p><h2>{info.summary}</h2><span>팀 소개 보기 →</span></div>
                   <strong className="team-card-count">{members.length}<small>명</small></strong>
                 </Link>
               );

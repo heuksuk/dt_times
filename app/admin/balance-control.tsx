@@ -7,7 +7,7 @@ type Move = { participantName: string; fromTeam: TeamCode; toTeam: TeamCode };
 
 const TEAM_LABELS: Record<TeamCode, string> = {
   DO: "도 · 돼지",
-  GAE: "개 · 개",
+  GAE: "개 · 강아지",
   GEOL: "걸 · 양",
   YUT: "윷 · 소",
   MO: "모 · 말",
