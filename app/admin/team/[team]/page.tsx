@@ -72,6 +72,12 @@ export default async function TeamDetailPage({ params }: { params: Promise<{ tea
       </section>
 
       <section className="strength-card">
+        <h2 className="strength-headline">{info.strengthHeadline}</h2>
+        <p className="strength-description">{info.strengthDescription}</p>
+        <div className="team-magic">
+          <span>이 팀의 숨은 능력</span>
+          <p>“{info.teamMagic}”</p>
+        </div>
         <p className="section-kicker">이 팀의 강점</p>
         <div className="keyword-row">
           {info.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}

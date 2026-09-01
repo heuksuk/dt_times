@@ -135,9 +135,16 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .team-hero h1 { font-size: clamp(2rem, 7vw, 3.25rem); }
 .team-summary { max-width: 460px; margin: 13px 0 0; color: var(--muted); line-height: 1.7; }
 .strength-card, .member-card { margin-top: 18px; padding: 27px; border: 1px solid var(--line); border-radius: 24px; background: rgba(255,255,255,0.92); box-shadow: 0 8px 20px rgba(89, 61, 34, 0.05); }
-.strength-card > p:last-child { margin: 18px 0 0; color: var(--muted); line-height: 1.65; }
-.keyword-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.strength-card { display: flex; flex-direction: column; }
+.strength-card .section-kicker { display: none; }
+.strength-headline { order: 1; max-width: 570px; margin: 0 0 17px; font-size: clamp(1.25rem, 3.6vw, 1.65rem); line-height: 1.4; letter-spacing: -0.045em; }
+.strength-description { order: 2; margin: 0 0 20px; color: var(--muted); line-height: 1.8; word-break: keep-all; }
+.strength-card > p:last-child { display: none; }
+.keyword-row { display: flex; flex-wrap: wrap; order: 3; gap: 8px; }
 .keyword-row span { padding: 8px 12px; border-radius: 999px; color: var(--detail-accent); background: var(--detail-soft); font-size: 0.86rem; font-weight: 800; }
+.team-magic { order: 4; margin: 22px 0 0; padding: 17px 18px; border-left: 3px solid var(--detail-accent); border-radius: 0 15px 15px 0; background: var(--detail-soft); }
+.team-magic span { display: block; margin-bottom: 6px; color: var(--detail-accent); font-size: 0.75rem; font-weight: 850; letter-spacing: 0.05em; }
+.team-magic p { margin: 0; color: var(--text); font-size: 0.95rem; font-weight: 700; line-height: 1.6; word-break: keep-all; }
 .member-card-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 19px; border-bottom: 1px solid var(--line); }
 .member-card-title h2 { margin: 0; font-size: 1.3rem; letter-spacing: -0.04em; }
 .member-count { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 50%; color: var(--detail-accent); background: var(--detail-soft); font-weight: 850; }
