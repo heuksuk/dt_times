@@ -312,3 +312,81 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
   .game2-scoring .game2-undo { grid-column: 2; grid-row: 1; }
   .game2-round-actions { grid-template-columns: 1fr 1fr; }
 }
+
+/* Game 2 projector-focused refinements */
+.game2-shell { padding-top: 16px; }
+.game2-scoreboard { gap: 9px; }
+.game2-scoreboard button { grid-template-columns: 44px minmax(42px, 1fr) auto; min-height: 76px; padding: 9px 14px; border-width: 2px; border-radius: 17px; box-shadow: 0 5px 14px rgba(89,61,34,.07); transition: border-color 160ms ease, background 160ms ease, transform 160ms ease; }
+.game2-scoreboard button[aria-pressed="true"] { border-color: var(--team-accent, var(--primary)); background: var(--team-soft, var(--primary-soft)); transform: translateY(2px); }
+.game2-scoreboard button[data-team="DO"] { --team-accent: #bd604f; --team-soft: #ffebe5; }
+.game2-scoreboard button[data-team="GAE"] { --team-accent: #34715b; --team-soft: #e7f3ed; }
+.game2-scoreboard button[data-team="GEOL"] { --team-accent: #a97932; --team-soft: #fff5df; }
+.game2-scoreboard button[data-team="YUT"] { --team-accent: #4d7195; --team-soft: #e8f1fb; }
+.game2-scoreboard button[data-team="MO"] { --team-accent: #79538e; --team-soft: #f3eafa; }
+.game2-scoreboard img { width: 44px; height: 44px; }
+.game2-scoreboard .game2-team-name { font-size: .9rem; }
+.game2-scoreboard strong { color: var(--team-accent, var(--festival-ink)); font-size: 1.85rem; line-height: 1; }
+.game2-scoreboard strong small { margin-left: 2px; font-size: .65rem; }
+.game2-selected { position: absolute; right: 8px; bottom: 4px; color: var(--team-accent); font-size: .64rem; font-weight: 900; }
+.game2-crown { position: absolute; top: -11px; right: 9px; color: #b17a19; font-size: 1.25rem; filter: drop-shadow(0 2px 2px rgba(90,55,10,.15)); }
+.game2-stage { min-height: 545px; margin-top: 14px; padding: 24px 30px 26px; border-radius: 24px; }
+.game2-meta span[data-category="인물명언"] { color: #27685d; background: #e6f3ef; }
+.game2-meta span[data-category="영화"] { color: #79538e; background: #f3eafa; }
+.game2-meta span[data-category="드라마"] { color: #4d7195; background: #e8f1fb; }
+.game2-progress { height: 5px; margin-top: 12px; overflow: hidden; border-radius: 99px; background: #eee6dc; }
+.game2-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mustard), var(--primary)); transition: width 250ms ease; }
+.game2-phrase { min-height: 310px; align-content: center; gap: 20px 25px; padding: 32px 8px 24px; }
+.game2-word { display: inline-flex; align-items: flex-end; gap: 5px; white-space: nowrap; }
+.game2-letter { width: clamp(46px, 4.25vw, 62px); height: clamp(62px, 5.5vw, 78px); border-bottom-width: 5px; border-radius: 8px 8px 3px 3px; font-size: clamp(2.25rem, 3.6vw, 3.25rem); transition: background 150ms ease, border-color 150ms ease, transform 150ms ease; }
+.game2-letter[data-revealed="true"] { animation: game2-reveal 320ms ease-out; }
+.game2-punctuation { margin-left: 1px; font-size: clamp(2.25rem, 3.6vw, 3.25rem); line-height: 1.35; }
+.game2-source { margin: -10px 0 18px; font-size: 1.3rem; }
+.game2-reveal-actions { display: flex; justify-content: center; gap: 12px; margin-bottom: 22px; }
+.game2-reveal-actions button { width: min(240px, 34%); min-height: 58px; border: 0; border-radius: 14px; padding: 0 20px; color: #fff; font-size: 1rem; font-weight: 850; cursor: pointer; }
+.game2-reveal-actions .reveal-random { background: var(--mustard); box-shadow: 0 8px 18px rgba(199,150,63,.22); }
+.game2-reveal-actions .reveal-all { background: var(--jade); box-shadow: 0 8px 18px rgba(62,113,103,.2); }
+.game2-reveal-actions button:disabled { cursor: not-allowed; opacity: .4; box-shadow: none; }
+.game2-round-actions { display: flex; justify-content: space-between; padding-top: 17px; border-top: 1px solid var(--line); }
+.game2-round-actions button { min-width: 150px; min-height: 44px; border-radius: 12px; color: var(--muted); background: transparent; }
+.game2-round-actions button:last-child { color: var(--primary-dark); background: var(--primary-soft); }
+.game2-scoring { grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.3fr) auto; min-height: 84px; padding: 11px 13px; border-radius: 20px; }
+.game2-selected-team { display: flex !important; align-items: center; flex-direction: row !important; gap: 10px; }
+.game2-selected-team img { width: 42px; height: 42px; object-fit: contain; }
+.game2-selected-team > span { display: flex; flex-direction: column; }
+.game2-selected-team strong { margin-top: 2px !important; }
+.game2-scoring > button { border-radius: 14px; font-size: 1rem; }
+.game2-toast { top: auto; bottom: 122px; padding: 13px 24px; font-size: 1rem; animation: game2-toast-in 200ms ease-out; }
+.game2-results li[data-rank="1"] { border: 3px solid var(--mustard); background: #fff9e9; transform: scale(1.025); }
+.game2-results li[data-rank="2"] { border-color: #b7b7b7; }
+.game2-results li[data-rank="3"] { border-color: #bc845f; }
+
+@keyframes game2-reveal {
+  from { color: transparent; transform: rotateY(75deg) scale(.88); }
+  to { color: var(--festival-ink); transform: rotateY(0) scale(1); }
+}
+@keyframes game2-toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (max-width: 900px) {
+  .game2-scoreboard button { grid-template-columns: 1fr; min-height: 103px; padding: 7px 3px; }
+  .game2-scoreboard img { width: 40px; height: 40px; }
+  .game2-scoreboard strong { font-size: 1.45rem; }
+  .game2-scoreboard .game2-team-name { font-size: .75rem; }
+  .game2-crown { top: -9px; right: 4px; }
+  .game2-selected { right: 4px; bottom: 2px; }
+  .game2-stage { padding-inline: 14px; }
+  .game2-phrase { gap: 16px 18px; }
+  .game2-word { gap: 3px; }
+  .game2-letter { width: clamp(37px, 8vw, 50px); height: clamp(52px, 10vw, 65px); }
+  .game2-reveal-actions button { width: min(260px, 48%); }
+  .game2-scoring { grid-template-columns: 1fr 1fr; }
+  .game2-scoring .game2-selected-team { grid-column: 1; grid-row: 1; }
+  .game2-scoring > button:not(.game2-undo) { grid-column: 1 / -1; grid-row: 2; min-height: 56px; }
+  .game2-scoring .game2-undo { grid-column: 2; grid-row: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game2-letter[data-revealed="true"], .game2-toast { animation: none; }
+}

@@ -10,6 +10,14 @@ import { TEAM_INFO } from "@/lib/team-info";
 
 const TEAM_KEYS: Record<string, TeamCode> = { "1": "DO", "2": "GAE", "3": "GEOL", "4": "YUT", "5": "MO" };
 
+function getWordTokens(text: string) {
+  const tokens: Array<{ text: string; start: number }> = [];
+  const pattern = /\S+/g;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(text)) !== null) tokens.push({ text: match[0], start: match.index });
+  return tokens;
+}
+
 export default function Game2Board() {
   const [session, setSession] = useState<Game2Session | null>(null);
   const [selectedTeam, setSelectedTeam] = useState<TeamCode | null>(null);
@@ -133,11 +141,15 @@ export default function Game2Board() {
   const fullyRevealed = session.fully_revealed.includes(phrase.id);
   const revealed = new Set(session.revealed[phrase.id] ?? []);
   const ranked = [...TEAM_CODES].sort((a, b) => session.scores[b] - session.scores[a]);
+  const highestScore = Math.max(...TEAM_CODES.map((team) => session.scores[team]));
 
   if (session.status === "finished") return (
     <main className="game2-shell game2-results">
       <p className="eyebrow">게임 종료</p><h1>최종 결과</h1>
-      <ol>{ranked.map((team, index) => <li key={team}><span>{index + 1}위</span><Image src={TEAM_INFO[team].icon} alt="" width={64} height={64}/><strong>{TEAM_INFO[team].name} 팀</strong><b>{session.scores[team]}점</b></li>)}</ol>
+      <ol>{ranked.map((team) => {
+        const rank = TEAM_CODES.filter((other) => session.scores[other] > session.scores[team]).length + 1;
+        return <li data-rank={rank} key={team}><span>{rank === 1 ? "🏆" : `${rank}위`}</span><Image src={TEAM_INFO[team].icon} alt="" width={64} height={64}/><strong>{TEAM_INFO[team].name} 팀</strong><b>{session.scores[team]}점</b></li>;
+      })}</ol>
       {error && <p className="game2-error">{error}</p>}
       <div className="game2-result-actions"><button onClick={undo} disabled={busy}>마지막 점수 취소</button><button onClick={newGame} disabled={busy}>처음부터 다시 시작</button></div>
     </main>
@@ -146,27 +158,35 @@ export default function Game2Board() {
   return (
     <main className="game2-shell">
       <header className="game2-scoreboard">
-        {TEAM_CODES.map((team, index) => <button aria-pressed={selectedTeam === team} data-team={team} key={team} onClick={() => setSelectedTeam(selectedTeam === team ? null : team)}><span className="game2-key">{index + 1}</span><Image src={TEAM_INFO[team].icon} alt="" width={58} height={58}/><span>{TEAM_INFO[team].name} 팀</span><strong>{session.scores[team]}</strong></button>)}
+        {TEAM_CODES.map((team, index) => <button aria-pressed={selectedTeam === team} data-team={team} key={team} onClick={() => setSelectedTeam(selectedTeam === team ? null : team)}><span className="game2-key">{index + 1}</span>{highestScore > 0 && session.scores[team] === highestScore && <span className="game2-crown" aria-label="현재 선두">♛</span>}<Image src={TEAM_INFO[team].icon} alt="" width={48} height={48}/><span className="game2-team-name">{TEAM_INFO[team].name} 팀</span><strong>{session.scores[team]}<small>점</small></strong>{selectedTeam === team && <span className="game2-selected">✓ 선택</span>}</button>)}
       </header>
 
       <section className="game2-stage">
-        <div className="game2-meta"><span>{phrase.category}</span><strong>{session.current_round + 1} / {GAME2_PHRASES.length}</strong></div>
+        <div className="game2-meta"><span data-category={phrase.category}>{phrase.category}</span><strong>{session.current_round + 1} / {GAME2_PHRASES.length}</strong></div>
+        <div className="game2-progress" aria-hidden="true"><span style={{ width: `${((session.current_round + 1) / GAME2_PHRASES.length) * 100}%` }} /></div>
         <div className="game2-phrase" aria-label="숨은 문장">
-          {Array.from(phrase.text).map((character, index) => isRevealableCharacter(character) ? (
-            <button aria-label={revealed.has(index) || fullyRevealed ? character : `${index + 1}번째 숨은 글자`} className="game2-letter" data-revealed={revealed.has(index) || fullyRevealed} disabled={busy || revealed.has(index) || fullyRevealed} key={`${index}-${character}`} onClick={() => reveal(index)}>{revealed.has(index) || fullyRevealed ? character : ""}</button>
-          ) : <span className={character === " " ? "game2-space" : "game2-punctuation"} key={`${index}-${character}`}>{character}</span>)}
+          {getWordTokens(phrase.text).map((token) => <span className="game2-word" key={`${token.start}-${token.text}`}>
+            {Array.from(token.text).map((character, localIndex) => {
+              const index = token.start + localIndex;
+              return isRevealableCharacter(character) ? (
+                <button aria-label={revealed.has(index) || fullyRevealed ? character : `${index + 1}번째 숨은 글자`} className="game2-letter" data-revealed={revealed.has(index) || fullyRevealed} disabled={busy || revealed.has(index) || fullyRevealed} key={`${index}-${character}`} onClick={() => reveal(index)}>{revealed.has(index) || fullyRevealed ? character : ""}</button>
+              ) : <span className="game2-punctuation" key={`${index}-${character}`}>{character}</span>;
+            })}
+          </span>)}
         </div>
         {fullyRevealed && <p className="game2-source">— {phrase.source}</p>}
-        <div className="game2-round-actions">
-          <button disabled={busy || session.current_round === 0} onClick={() => move(session.current_round - 1)}>이전 문장</button>
-          <button className="reveal-random" disabled={busy || fullyRevealed} onClick={revealRandom}>난수 글자 공개</button>
+        <div className="game2-reveal-actions">
+          <button className="reveal-random" disabled={busy || fullyRevealed} onClick={revealRandom}>✦ 글자 공개</button>
           <button className="reveal-all" disabled={busy || fullyRevealed} onClick={revealAll}>{fullyRevealed ? "전체 공개됨" : "전체 문장 공개"}</button>
-          {session.current_round === GAME2_PHRASES.length - 1 ? <button disabled={busy} onClick={finish}>게임 종료</button> : <button disabled={busy} onClick={() => move(session.current_round + 1)}>다음 문장</button>}
+        </div>
+        <div className="game2-round-actions">
+          <button disabled={busy || session.current_round === 0} onClick={() => move(session.current_round - 1)}>← 이전 문제</button>
+          {session.current_round === GAME2_PHRASES.length - 1 ? <button disabled={busy} onClick={finish}>최종 결과 보기</button> : <button disabled={busy} onClick={() => move(session.current_round + 1)}>다음 문제 →</button>}
         </div>
       </section>
 
       <section className="game2-scoring">
-        <div><span>선택 팀</span><strong>{selectedTeam ? `${TEAM_INFO[selectedTeam].name} 팀` : "팀을 선택하세요"}</strong></div>
+        <div className="game2-selected-team">{selectedTeam && <Image src={TEAM_INFO[selectedTeam].icon} alt="" width={42} height={42}/>}<span>선택된 팀<strong>{selectedTeam ? `${TEAM_INFO[selectedTeam].name} 팀` : "팀을 먼저 선택하세요"}</strong></span></div>
         <button disabled={busy || !selectedTeam} onClick={() => award()}>문장 정답 <b>+1</b></button>
         <button className="game2-undo" disabled={busy} onClick={undo}>마지막 점수 취소</button>
       </section>
