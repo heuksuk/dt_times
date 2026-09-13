@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GAME2_PHRASES, isRevealableCharacter } from "@/lib/game2/phrases";
 import type { Game2Session } from "@/lib/game2/types";
 import { TEAM_CODES, type TeamCode } from "@/lib/types";
