@@ -91,6 +91,7 @@ export default async function AdminPage() {
       <header className="admin-header">
         <div><p className="eyebrow">관리자</p><h1>설문 현황</h1></div>
         <div className="admin-header-actions">
+          <Link className="game2-entry-link" href="/admin/game2">2번 게임 열기</Link>
           <RefreshControl checkedAt={checkedAt} />
           <LogoutButton />
         </div>
