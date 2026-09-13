@@ -266,11 +266,12 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .game2-space { width: clamp(20px, 2.2vw, 34px); }
 .game2-punctuation { align-self: center; color: var(--festival-ink); font-family: var(--font-festival), serif; font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 700; }
 .game2-source { margin: -15px 0 22px; color: var(--muted); font-family: var(--font-festival), serif; font-size: 1.35rem; text-align: center; }
-.game2-round-actions { display: grid; grid-template-columns: 1fr 1.35fr 1fr; gap: 12px; }
+.game2-round-actions { display: grid; grid-template-columns: 1fr 1.15fr 1.35fr 1fr; gap: 12px; }
 .game2-round-actions button, .game2-result-actions button { min-height: 54px; border: 0; border-radius: 15px; padding: 0 18px; color: var(--text); background: #eee8df; font-weight: 800; cursor: pointer; }
 .game2-round-actions .reveal-all { color: #fff; background: var(--jade); }
+.game2-round-actions .reveal-random { color: #fff; background: var(--mustard); }
 .game2-round-actions button:disabled, .game2-result-actions button:disabled { cursor: not-allowed; opacity: .42; }
-.game2-scoring { position: fixed; z-index: 30; right: 24px; bottom: 20px; left: 24px; display: grid; grid-template-columns: minmax(170px, 1fr) 1.2fr 1.2fr auto; width: min(calc(100% - 48px), 1392px); min-height: 94px; margin: auto; gap: 12px; padding: 14px; border: 1px solid rgba(233,225,213,.9); border-radius: 24px; background: rgba(255,255,255,.94); box-shadow: 0 16px 50px rgba(54,38,24,.2); backdrop-filter: blur(12px); }
+.game2-scoring { position: fixed; z-index: 30; right: 24px; bottom: 20px; left: 24px; display: grid; grid-template-columns: minmax(170px, 1fr) 1.5fr auto; width: min(calc(100% - 48px), 1392px); min-height: 94px; margin: auto; gap: 12px; padding: 14px; border: 1px solid rgba(233,225,213,.9); border-radius: 24px; background: rgba(255,255,255,.94); box-shadow: 0 16px 50px rgba(54,38,24,.2); backdrop-filter: blur(12px); }
 .game2-scoring > div { display: flex; flex-direction: column; justify-content: center; padding: 0 12px; }
 .game2-scoring > div span { color: var(--muted); font-size: .75rem; }
 .game2-scoring > div strong { margin-top: 4px; font-size: 1.15rem; }
@@ -309,4 +310,5 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
   .game2-scoring > div { grid-column: 1; grid-row: 1; }
   .game2-scoring > button { min-height: 58px; }
   .game2-scoring .game2-undo { grid-column: 2; grid-row: 1; }
+  .game2-round-actions { grid-template-columns: 1fr 1fr; }
 }

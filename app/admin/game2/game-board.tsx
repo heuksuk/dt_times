@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { GAME2_PHRASES, isRevealableCharacter } from "@/lib/game2/phrases";
 import type { Game2Session } from "@/lib/game2/types";
 import { TEAM_CODES, type TeamCode } from "@/lib/types";
@@ -47,10 +47,15 @@ export default function Game2Board() {
     } finally { setBusy(false); }
   }
 
+  function showNotice(message: string) {
+    setNotice(message);
+    window.setTimeout(() => setNotice(""), 1800);
+  }
+
   async function newGame() {
     if (session && !window.confirm("현재 게임을 끝내고 점수 0점부터 새로 시작할까요?")) return;
     const next = await request("POST", { action: "new" });
-    if (next) { setSelectedTeam(null); setNotice("새 게임을 시작했습니다."); }
+    if (next) { setSelectedTeam(null); showNotice("새 게임을 시작했습니다."); }
   }
 
   async function reveal(index: number) {
@@ -63,15 +68,35 @@ export default function Game2Board() {
     await request("PATCH", { action: "revealAll", sessionId: session.id, version: session.version });
   }
 
-  const award = useCallback(async (points: 1 | 3) => {
+  async function revealRandom() {
+    if (!session) return;
+    const phrase = GAME2_PHRASES[session.current_round];
+    const revealed = new Set(session.revealed[phrase.id] ?? []);
+    const candidates = Array.from(phrase.text)
+      .map((character, index) => ({ character, index }))
+      .filter(({ character, index }) => isRevealableCharacter(character) && !revealed.has(index));
+
+    if (candidates.length === 0) {
+      showNotice("공개할 글자가 없습니다.");
+      return;
+    }
+
+    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+    const next = await request("PATCH", {
+      action: "reveal",
+      sessionId: session.id,
+      version: session.version,
+      characterIndex: chosen.index,
+    });
+    if (next) showNotice(`${chosen.index + 1}번 글자를 공개했습니다.`);
+  }
+
+  async function award() {
     if (!session || !selectedTeam || busy) return;
     const teamName = TEAM_INFO[selectedTeam].name;
-    if (points === 3 && !window.confirm(`${teamName} 팀에 문장 정답 3점을 줄까요?`)) return;
-    const next = await request("POST", { action: "score", sessionId: session.id, version: session.version, team: selectedTeam, points, roundIndex: session.current_round });
-    if (next) { setNotice(`${teamName} 팀 +${points}점`); setSelectedTeam(null); window.setTimeout(() => setNotice(""), 1800); }
-  // request is intentionally tied to the current render state.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, selectedTeam, busy]);
+    const next = await request("POST", { action: "score", sessionId: session.id, version: session.version, team: selectedTeam, points: 1, roundIndex: session.current_round });
+    if (next) { showNotice(`${teamName} 팀 +1점`); setSelectedTeam(null); }
+  }
 
   async function undo() {
     if (!session || !window.confirm("가장 최근에 부여한 점수를 취소할까요?")) return;
@@ -95,16 +120,14 @@ export default function Game2Board() {
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
       const team = TEAM_KEYS[event.key];
       if (team) setSelectedTeam(team);
-      else if (event.key.toLowerCase() === "q") void award(1);
-      else if (event.key.toLowerCase() === "w") void award(3);
       else if (event.key === "Escape") setSelectedTeam(null);
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [award]);
+  }, []);
 
   if (loading) return <main className="game2-loading">게임을 불러오는 중...</main>;
-  if (!session) return <main className="game2-empty"><p className="eyebrow">2번 게임</p><h1>숨은 명대사 맞히기</h1><p>새 게임을 시작하면 12개 문장이 준비됩니다.</p>{error && <p className="game2-error">{error}</p>}<button className="game2-main-button" onClick={newGame}>새 게임 시작</button><Link href="/admin">관리자 화면으로</Link></main>;
+  if (!session) return <main className="game2-empty"><p className="eyebrow">2번 게임</p><h1>숨은 명대사 맞히기</h1><p>새 게임을 시작하면 {GAME2_PHRASES.length}개 문장이 준비됩니다.</p>{error && <p className="game2-error">{error}</p>}<button className="game2-main-button" onClick={newGame}>새 게임 시작</button><Link href="/admin">관리자 화면으로</Link></main>;
 
   const phrase = GAME2_PHRASES[session.current_round];
   const fullyRevealed = session.fully_revealed.includes(phrase.id);
@@ -136,6 +159,7 @@ export default function Game2Board() {
         {fullyRevealed && <p className="game2-source">— {phrase.source}</p>}
         <div className="game2-round-actions">
           <button disabled={busy || session.current_round === 0} onClick={() => move(session.current_round - 1)}>이전 문장</button>
+          <button className="reveal-random" disabled={busy || fullyRevealed} onClick={revealRandom}>난수 글자 공개</button>
           <button className="reveal-all" disabled={busy || fullyRevealed} onClick={revealAll}>{fullyRevealed ? "전체 공개됨" : "전체 문장 공개"}</button>
           {session.current_round === GAME2_PHRASES.length - 1 ? <button disabled={busy} onClick={finish}>게임 종료</button> : <button disabled={busy} onClick={() => move(session.current_round + 1)}>다음 문장</button>}
         </div>
@@ -143,13 +167,12 @@ export default function Game2Board() {
 
       <section className="game2-scoring">
         <div><span>선택 팀</span><strong>{selectedTeam ? `${TEAM_INFO[selectedTeam].name} 팀` : "팀을 선택하세요"}</strong></div>
-        <button disabled={busy || !selectedTeam} onClick={() => award(1)}>글자 정답 <b>+1</b><small>Q</small></button>
-        <button disabled={busy || !selectedTeam} onClick={() => award(3)}>문장 정답 <b>+3</b><small>W</small></button>
+        <button disabled={busy || !selectedTeam} onClick={() => award()}>문장 정답 <b>+1</b></button>
         <button className="game2-undo" disabled={busy} onClick={undo}>마지막 점수 취소</button>
       </section>
       {notice && <div className="game2-toast" role="status">{notice}</div>}
       {error && <div className="game2-error" role="alert">{error}<button onClick={load}>새로고침</button></div>}
-      <footer><Link href="/admin">관리자 화면</Link><span>1~5 팀 선택 · Q +1 · W +3 · Esc 선택 해제</span></footer>
+      <footer><Link href="/admin">관리자 화면</Link></footer>
     </main>
   );
 }

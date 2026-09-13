@@ -42,7 +42,7 @@ declare
   current_session public.game2_sessions;
   next_scores jsonb;
 begin
-  if p_points not in (1, 3) or p_reason not in ('letter', 'phrase') then
+  if p_points <> 1 or p_reason <> 'phrase' then
     raise exception 'invalid score';
   end if;
 

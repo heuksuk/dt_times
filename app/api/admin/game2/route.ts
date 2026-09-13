@@ -53,14 +53,14 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "score") {
-      if (!validTeam(body.team) || (body.points !== 1 && body.points !== 3) || !Number.isInteger(body.version)) {
+      if (!validTeam(body.team) || body.points !== 1 || !Number.isInteger(body.version)) {
         return NextResponse.json({ error: "점수 요청이 올바르지 않습니다." }, { status: 400 });
       }
       const { data, error } = await supabase.rpc("game2_add_score", {
         p_session_id: body.sessionId,
         p_team: body.team,
         p_points: body.points,
-        p_reason: body.points === 1 ? "letter" : "phrase",
+        p_reason: "phrase",
         p_round_index: body.roundIndex,
         p_version: body.version,
       });
