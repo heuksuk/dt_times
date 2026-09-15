@@ -333,6 +333,7 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .game2-meta span[data-category="인물명언"] { color: #27685d; background: #e6f3ef; }
 .game2-meta span[data-category="영화"] { color: #79538e; background: #f3eafa; }
 .game2-meta span[data-category="드라마"] { color: #4d7195; background: #e8f1fb; }
+.game2-meta span[data-category="인물 맞히기"] { color: #fff; background: #5d4a86; }
 .game2-progress { height: 5px; margin-top: 12px; overflow: hidden; border-radius: 99px; background: #eee6dc; }
 .game2-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mustard), var(--primary)); transition: width 250ms ease; }
 .game2-phrase { min-height: 310px; align-content: center; gap: 20px 25px; padding: 32px 8px 24px; }
@@ -341,6 +342,14 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
 .game2-letter[data-revealed="true"] { animation: game2-reveal 320ms ease-out; }
 .game2-punctuation { margin-left: 1px; font-size: clamp(2.25rem, 3.6vw, 3.25rem); line-height: 1.35; }
 .game2-source { margin: -10px 0 18px; font-size: 1.3rem; }
+.game2-face-wrap { display: grid; min-height: 365px; padding: 22px 8px; place-items: center; }
+.game2-face-grid { display: grid; width: min(48vh, 460px, 82vw); aspect-ratio: 1; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 4px; overflow: hidden; padding: 4px; border: 1px solid #d8cbbb; border-radius: 20px; background: #fff; box-shadow: 0 14px 34px rgba(57,39,24,.16); }
+.game2-face-tile { display: grid; min-width: 0; min-height: 0; padding: 0; place-items: center; border: 0; border-radius: 5px; background-repeat: no-repeat; background-size: 300% 300%; cursor: pointer; transition: transform 220ms ease, filter 220ms ease; }
+.game2-face-tile[data-revealed="false"] { background-image: none !important; background-color: #433951; background-image: linear-gradient(145deg, #514660, #352e40) !important; }
+.game2-face-tile[data-revealed="false"]:hover { filter: brightness(1.16); transform: scale(.97); }
+.game2-face-tile[data-revealed="true"] { animation: game2-tile-reveal 420ms ease-out; }
+.game2-face-tile span { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(255,255,255,.24); border-radius: 50%; color: rgba(255,255,255,.78); background: rgba(255,255,255,.08); font-weight: 850; }
+.game2-face-tile[data-revealed="true"] span { display: none; }
 .game2-reveal-actions { display: flex; justify-content: center; gap: 12px; margin-bottom: 22px; }
 .game2-reveal-actions button { width: min(240px, 34%); min-height: 58px; border: 0; border-radius: 14px; padding: 0 20px; color: #fff; font-size: 1rem; font-weight: 850; cursor: pointer; }
 .game2-reveal-actions .reveal-random { background: var(--mustard); box-shadow: 0 8px 18px rgba(199,150,63,.22); }
@@ -368,6 +377,10 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
   from { opacity: 0; transform: translate(-50%, 8px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
+@keyframes game2-tile-reveal {
+  from { filter: brightness(0); transform: rotateY(80deg); }
+  to { filter: brightness(1); transform: rotateY(0); }
+}
 
 @media (max-width: 900px) {
   .game2-scoreboard button { grid-template-columns: 1fr; min-height: 103px; padding: 7px 3px; }
@@ -377,6 +390,7 @@ h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); line-height: 1.22; letter
   .game2-crown { top: -9px; right: 4px; }
   .game2-selected { right: 4px; bottom: 2px; }
   .game2-stage { padding-inline: 14px; }
+  .game2-face-wrap { min-height: 330px; }
   .game2-phrase { gap: 16px 18px; }
   .game2-word { gap: 3px; }
   .game2-letter { width: clamp(37px, 8vw, 50px); height: clamp(52px, 10vw, 65px); }

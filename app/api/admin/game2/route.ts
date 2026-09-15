@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { ADMIN_SESSION_COOKIE, isValidAdminSession } from "@/lib/admin-auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { GAME2_PHRASES, isRevealableCharacter } from "@/lib/game2/phrases";
+import { GAME2_ROUNDS, isRevealableCharacter } from "@/lib/game2/phrases";
 import { TEAM_CODES, type TeamCode } from "@/lib/types";
 
 const EMPTY_SCORES = { DO: 0, GAE: 0, GEOL: 0, YUT: 0, MO: 0 };
@@ -101,21 +101,24 @@ export async function PATCH(request: Request) {
     const changes: Record<string, unknown> = { version: current.version + 1, updated_at: new Date().toISOString() };
 
     if (body.action === "reveal") {
-      const phrase = GAME2_PHRASES[current.current_round];
-      if (!phrase || !Number.isInteger(body.characterIndex)) return NextResponse.json({ error: "글자 위치가 올바르지 않습니다." }, { status: 400 });
+      const round = GAME2_ROUNDS[current.current_round];
+      if (!round || !Number.isInteger(body.characterIndex)) return NextResponse.json({ error: "공개 위치가 올바르지 않습니다." }, { status: 400 });
       const index = Number(body.characterIndex);
-      if (!phrase.text[index] || !isRevealableCharacter(phrase.text[index])) return NextResponse.json({ error: "공개할 수 없는 글자입니다." }, { status: 400 });
+      const validIndex = round.kind === "phrase"
+        ? Boolean(round.text[index] && isRevealableCharacter(round.text[index]))
+        : index >= 0 && index < 9;
+      if (!validIndex) return NextResponse.json({ error: "공개할 수 없는 위치입니다." }, { status: 400 });
       const revealed = { ...(current.revealed ?? {}) } as Record<string, number[]>;
-      revealed[phrase.id] = Array.from(new Set([...(revealed[phrase.id] ?? []), index])).sort((a, b) => a - b);
+      revealed[round.id] = Array.from(new Set([...(revealed[round.id] ?? []), index])).sort((a, b) => a - b);
       changes.revealed = revealed;
     } else if (body.action === "revealAll") {
-      const phrase = GAME2_PHRASES[current.current_round];
-      if (!phrase) return NextResponse.json({ error: "문장을 찾을 수 없습니다." }, { status: 400 });
-      changes.fully_revealed = Array.from(new Set([...(current.fully_revealed ?? []), phrase.id]));
+      const round = GAME2_ROUNDS[current.current_round];
+      if (!round) return NextResponse.json({ error: "문제를 찾을 수 없습니다." }, { status: 400 });
+      changes.fully_revealed = Array.from(new Set([...(current.fully_revealed ?? []), round.id]));
     } else if (body.action === "round") {
       if (!Number.isInteger(body.roundIndex)) return NextResponse.json({ error: "라운드가 올바르지 않습니다." }, { status: 400 });
       const roundIndex = Number(body.roundIndex);
-      if (roundIndex < 0 || roundIndex >= GAME2_PHRASES.length) return NextResponse.json({ error: "라운드 범위를 벗어났습니다." }, { status: 400 });
+      if (roundIndex < 0 || roundIndex >= GAME2_ROUNDS.length) return NextResponse.json({ error: "라운드 범위를 벗어났습니다." }, { status: 400 });
       changes.current_round = roundIndex;
       changes.status = "playing";
     } else if (body.action === "finish") {

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { GAME2_PHRASES, isRevealableCharacter } from "@/lib/game2/phrases";
+import { GAME2_ROUNDS, isRevealableCharacter } from "@/lib/game2/phrases";
 import type { Game2Session } from "@/lib/game2/types";
 import { TEAM_CODES, type TeamCode } from "@/lib/types";
 import { TEAM_INFO } from "@/lib/team-info";
@@ -72,17 +72,25 @@ export default function Game2Board() {
   }
 
   async function revealAll() {
-    if (!session || !window.confirm("전체 문장과 출처를 공개할까요? 점수는 자동으로 부여되지 않습니다.")) return;
+    if (!session) return;
+    const round = GAME2_ROUNDS[session.current_round];
+    const message = round.kind === "face" ? "전체 사진과 정답을 공개할까요?" : "전체 문장과 출처를 공개할까요? 점수는 자동으로 부여되지 않습니다.";
+    if (!window.confirm(message)) return;
     await request("PATCH", { action: "revealAll", sessionId: session.id, version: session.version });
   }
 
   async function revealRandom() {
     if (!session) return;
-    const phrase = GAME2_PHRASES[session.current_round];
-    const revealed = new Set(session.revealed[phrase.id] ?? []);
-    const candidates = Array.from(phrase.text)
-      .map((character, index) => ({ character, index }))
-      .filter(({ character, index }) => isRevealableCharacter(character) && !revealed.has(index));
+    const round = GAME2_ROUNDS[session.current_round];
+    const revealed = new Set(session.revealed[round.id] ?? []);
+    const candidates = round.kind === "phrase"
+      ? Array.from(round.text)
+        .map((character, index) => ({ character, index }))
+        .filter(({ character, index }) => isRevealableCharacter(character) && !revealed.has(index))
+      : round.revealOrder
+        .filter((index) => !revealed.has(index))
+        .slice(0, 1)
+        .map((index) => ({ character: "", index }));
 
     if (candidates.length === 0) {
       showNotice("공개할 글자가 없습니다.");
@@ -96,7 +104,7 @@ export default function Game2Board() {
       version: session.version,
       characterIndex: chosen.index,
     });
-    if (next) showNotice(`${chosen.index + 1}번 글자를 공개했습니다.`);
+    if (next) showNotice(round.kind === "face" ? `${chosen.index + 1}번 사진 조각을 공개했습니다.` : `${chosen.index + 1}번 글자를 공개했습니다.`);
   }
 
   async function award() {
@@ -135,11 +143,11 @@ export default function Game2Board() {
   }, []);
 
   if (loading) return <main className="game2-loading">게임을 불러오는 중...</main>;
-  if (!session) return <main className="game2-empty"><p className="eyebrow">2번 게임</p><h1>숨은 명대사 맞히기</h1><p>새 게임을 시작하면 {GAME2_PHRASES.length}개 문장이 준비됩니다.</p>{error && <p className="game2-error">{error}</p>}<button className="game2-main-button" onClick={newGame}>새 게임 시작</button><Link href="/admin">관리자 화면으로</Link></main>;
+  if (!session) return <main className="game2-empty"><p className="eyebrow">2번 게임</p><h1>숨은 명대사 & 인물 맞히기</h1><p>새 게임을 시작하면 {GAME2_ROUNDS.length}개 문제가 준비됩니다.</p>{error && <p className="game2-error">{error}</p>}<button className="game2-main-button" onClick={newGame}>새 게임 시작</button><Link href="/admin">관리자 화면으로</Link></main>;
 
-  const phrase = GAME2_PHRASES[session.current_round];
-  const fullyRevealed = session.fully_revealed.includes(phrase.id);
-  const revealed = new Set(session.revealed[phrase.id] ?? []);
+  const round = GAME2_ROUNDS[session.current_round];
+  const fullyRevealed = session.fully_revealed.includes(round.id);
+  const revealed = new Set(session.revealed[round.id] ?? []);
   const ranked = [...TEAM_CODES].sort((a, b) => session.scores[b] - session.scores[a]);
   const highestScore = Math.max(...TEAM_CODES.map((team) => session.scores[team]));
 
@@ -162,10 +170,10 @@ export default function Game2Board() {
       </header>
 
       <section className="game2-stage">
-        <div className="game2-meta"><span data-category={phrase.category}>{phrase.category}</span><strong>{session.current_round + 1} / {GAME2_PHRASES.length}</strong></div>
-        <div className="game2-progress" aria-hidden="true"><span style={{ width: `${((session.current_round + 1) / GAME2_PHRASES.length) * 100}%` }} /></div>
-        <div className="game2-phrase" aria-label="숨은 문장">
-          {getWordTokens(phrase.text).map((token) => <span className="game2-word" key={`${token.start}-${token.text}`}>
+        <div className="game2-meta"><span data-category={round.category}>{round.category}</span><strong>{session.current_round + 1} / {GAME2_ROUNDS.length}</strong></div>
+        <div className="game2-progress" aria-hidden="true"><span style={{ width: `${((session.current_round + 1) / GAME2_ROUNDS.length) * 100}%` }} /></div>
+        {round.kind === "phrase" ? <div className="game2-phrase" aria-label="숨은 문장">
+          {getWordTokens(round.text).map((token) => <span className="game2-word" key={`${token.start}-${token.text}`}>
             {Array.from(token.text).map((character, localIndex) => {
               const index = token.start + localIndex;
               return isRevealableCharacter(character) ? (
@@ -173,21 +181,36 @@ export default function Game2Board() {
               ) : <span className="game2-punctuation" key={`${index}-${character}`}>{character}</span>;
             })}
           </span>)}
-        </div>
-        {fullyRevealed && <p className="game2-source">— {phrase.source}</p>}
+        </div> : <div className="game2-face-wrap">
+          <div className="game2-face-grid" aria-label="가려진 인물 사진">
+            {Array.from({ length: 9 }, (_, index) => {
+              const isOpen = fullyRevealed || revealed.has(index);
+              return <button
+                aria-label={isOpen ? `${index + 1}번 공개된 사진 조각` : `${index + 1}번 가려진 사진 조각`}
+                className="game2-face-tile"
+                data-revealed={isOpen}
+                disabled={busy || isOpen}
+                key={index}
+                onClick={() => reveal(index)}
+                style={{ backgroundImage: `url(${round.image})`, backgroundPosition: `${(index % 3) * 50}% ${Math.floor(index / 3) * 50}%` }}
+              ><span>{index + 1}</span></button>;
+            })}
+          </div>
+        </div>}
+        {fullyRevealed && <p className="game2-source">— {round.kind === "phrase" ? round.source : `정답: ${round.name}`}</p>}
         <div className="game2-reveal-actions">
-          <button className="reveal-random" disabled={busy || fullyRevealed} onClick={revealRandom}>✦ 글자 공개</button>
-          <button className="reveal-all" disabled={busy || fullyRevealed} onClick={revealAll}>{fullyRevealed ? "전체 공개됨" : "전체 문장 공개"}</button>
+          <button className="reveal-random" disabled={busy || fullyRevealed} onClick={revealRandom}>✦ {round.kind === "face" ? "조각 공개" : "글자 공개"}</button>
+          <button className="reveal-all" disabled={busy || fullyRevealed} onClick={revealAll}>{fullyRevealed ? "전체 공개됨" : round.kind === "face" ? "전체 사진 공개" : "전체 문장 공개"}</button>
         </div>
         <div className="game2-round-actions">
           <button disabled={busy || session.current_round === 0} onClick={() => move(session.current_round - 1)}>← 이전 문제</button>
-          {session.current_round === GAME2_PHRASES.length - 1 ? <button disabled={busy} onClick={finish}>최종 결과 보기</button> : <button disabled={busy} onClick={() => move(session.current_round + 1)}>다음 문제 →</button>}
+          {session.current_round === GAME2_ROUNDS.length - 1 ? <button disabled={busy} onClick={finish}>최종 결과 보기</button> : <button disabled={busy} onClick={() => move(session.current_round + 1)}>다음 문제 →</button>}
         </div>
       </section>
 
       <section className="game2-scoring">
         <div className="game2-selected-team">{selectedTeam && <Image src={TEAM_INFO[selectedTeam].icon} alt="" width={42} height={42}/>}<span>선택된 팀<strong>{selectedTeam ? `${TEAM_INFO[selectedTeam].name} 팀` : "팀을 먼저 선택하세요"}</strong></span></div>
-        <button disabled={busy || !selectedTeam} onClick={() => award()}>문장 정답 <b>+1</b></button>
+        <button disabled={busy || !selectedTeam} onClick={() => award()}>{round.kind === "face" ? "인물 정답" : "문장 정답"} <b>+1</b></button>
         <button className="game2-undo" disabled={busy} onClick={undo}>마지막 점수 취소</button>
       </section>
       {notice && <div className="game2-toast" role="status">{notice}</div>}
